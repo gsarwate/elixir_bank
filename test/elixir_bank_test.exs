@@ -1,8 +1,8 @@
-defmodule ElixirBankTest do
+defmodule ElixirOTPBankTest do
   use ExUnit.Case
-  doctest ElixirBank
+  doctest ElixirOTPBank
 
   test "greets the world" do
-    assert ElixirBank.hello() == :world
+    assert ElixirOTPBank.hello() == :world
   end
 end

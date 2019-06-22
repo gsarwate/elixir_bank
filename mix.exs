@@ -1,9 +1,9 @@
-defmodule ElixirBank.MixProject do
+defmodule ElixirOTPBank.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :elixir_bank,
+      app: :elixir_otp_bank,
       version: "0.1.0",
       elixir: "~> 1.9-rc",
       start_permanent: Mix.env() == :prod,
