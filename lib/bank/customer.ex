@@ -1,21 +1,26 @@
 defmodule Bank.Customer do
-  defstruct auto_id: 1, accounts: %{}
+  @enforce_keys [:id]
+  defstruct id: nil, auto_account_id: 1, accounts: %{}
 
   @doc """
   Defines a function to create new bank customer
   """
-  def new(accounts \\ []) do
-    Enum.reduce(accounts, %Bank.Customer{}, &add_account(&2, &1))
+  def new(id, accounts \\ []) do
+    Enum.reduce(accounts, %Bank.Customer{id: id}, &add_account(&2, &1))
   end
 
   @doc """
   Defines a function to add new account for the bank customer
   """
   def add_account(customer, %Bank.Account{} = account) do
-    account = Map.put(account, :id, customer.auto_id)
-    new_accounts = Map.put(customer.accounts, customer.auto_id, account)
+    account = Map.put(account, :id, customer.auto_account_id)
+    new_accounts = Map.put(customer.accounts, customer.auto_account_id, account)
 
-    %Bank.Customer{customer | accounts: new_accounts, auto_id: customer.auto_id + 1}
+    %Bank.Customer{
+      customer
+      | accounts: new_accounts,
+        auto_account_id: customer.auto_account_id + 1
+    }
   end
 
   @doc """
@@ -24,6 +29,15 @@ defmodule Bank.Customer do
   def get_account_by_id(customer, account_id) do
     customer.accounts
     |> Enum.filter(fn {id, _} -> id == account_id end)
+    |> Enum.map(fn {_, account} -> account end)
+  end
+
+  @doc """
+  Defines a function to get account by account id
+  """
+  def get_account_by_number(customer, account_number) do
+    customer.accounts
+    |> Enum.filter(fn {_id, account} -> account.number == account_number end)
     |> Enum.map(fn {_, account} -> account end)
   end
 
