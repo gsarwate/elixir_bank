@@ -44,7 +44,10 @@ defmodule Bank.Customer do
   @doc """
   Defines function to get all accounts for the bank customer
   """
-  def get_accounts(customer), do: customer.accounts
+  def get_accounts(customer) do
+    customer.accounts
+    |> Enum.map(fn {_, account} -> account end)
+  end
 
   @doc """
   Defines function to update account for the bank customer

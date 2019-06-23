@@ -1,4 +1,4 @@
-defmodule Bank.CustomerServer do
+defmodule Bank.Customer.Server do
   use GenServer
 
   # Client
@@ -7,7 +7,7 @@ defmodule Bank.CustomerServer do
   Defines a function to start a server(GenServer). For every customer new server is created
   """
   def start(id) do
-    GenServer.start(Bank.CustomerServer, id)
+    GenServer.start(Bank.Customer.Server, id)
   end
 
   @doc """
