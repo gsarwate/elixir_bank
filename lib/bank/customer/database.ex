@@ -10,41 +10,39 @@ defmodule Bank.Customer.Database do
   end
 
   def store(key, data) do
-    GenServer.cast(__MODULE__, {:store, key, data})
+    key
+    |> choose_worker()
+    |> Bank.Customer.DatabaseWorker.store(key, data)
   end
 
-  def get(id) do
-    GenServer.call(__MODULE__, {:get, id})
+  def get(key) do
+    key
+    |> choose_worker()
+    |> Bank.Customer.DatabaseWorker.get(key)
   end
+
+  defp choose_worker(key) do
+    GenServer.call(__MODULE__, {:choose_worker, key})
+  end
+
   # Server (callbacks)
 
   @impl true
   def init(_) do
     File.mkdir_p!(@db_folder)
-    {:ok, nil}
+    {:ok, start_workers()}
   end
 
   @impl true
-  def handle_cast({:store, key, data}, state) do
-    key
-    |> filename()
-    |> File.write!(:erlang.term_to_binary(data))
-
-    {:noreply, state}
+  def handle_call({:choose_worker, key}, _from, workers) do
+    worker_key = :erlang.phash2(key, 3)
+    {:reply, Map.get(workers, worker_key), workers}
   end
 
-  @impl true
-  def handle_call({:get, key}, _from, state) do
-    data =
-      case File.read(filename(key)) do
-        {:ok, content} -> :erlang.binary_to_term(content)
-        _ -> nil
-      end
-
-    {:reply, data, state}
-  end
-
-  defp filename(key) do
-    Path.join(@db_folder, to_string(key))
+  defp start_workers() do
+    for index <- 1..3, into: %{} do
+      {:ok, pid} = Bank.Customer.DatabaseWorker.start(@db_folder)
+      {index - 1, pid}
+    end
   end
 end
