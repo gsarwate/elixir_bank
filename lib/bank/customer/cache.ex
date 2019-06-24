@@ -6,19 +6,20 @@ defmodule Bank.Customer.Cache do
 
   # Client
 
-  def start do
-    GenServer.start(__MODULE__, nil)
+  def start_link(_) do
+    IO.puts("--> Start : Bank Customer Cache.")
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def server_process(cache_pid, customer_id) do
-    GenServer.call(cache_pid, {:server_process, customer_id})
+  def server_process(customer_id) do
+    GenServer.call(__MODULE__, {:server_process, customer_id})
   end
 
   # Server (callbacks)
 
   @impl true
   def init(_) do
-    Bank.Customer.Database.start()
+    Bank.Customer.Database.start_link()
     {:ok, %{}}
   end
 
@@ -29,7 +30,7 @@ defmodule Bank.Customer.Cache do
         {:reply, customer_server, bank_customer_servers}
 
       :error ->
-        {:ok, new_server} = Bank.Customer.Server.start(customer_id)
+        {:ok, new_server} = Bank.Customer.Server.start_link(customer_id)
         {:reply, new_server, Map.put(bank_customer_servers, customer_id, new_server)}
     end
   end

@@ -5,8 +5,9 @@ defmodule Bank.Customer.Database do
 
   # Client
 
-  def start() do
-    GenServer.start(__MODULE__, nil, name: __MODULE__)
+  def start_link() do
+    IO.puts("--> Start : Bank Customer Database.")
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def store(key, data) do
@@ -41,7 +42,7 @@ defmodule Bank.Customer.Database do
 
   defp start_workers() do
     for index <- 1..3, into: %{} do
-      {:ok, pid} = Bank.Customer.DatabaseWorker.start(@db_folder)
+      {:ok, pid} = Bank.Customer.DatabaseWorker.start_link(@db_folder)
       {index - 1, pid}
     end
   end

@@ -6,9 +6,9 @@ defmodule BankCustomerServerTest do
   alias Bank.Customer.Server
 
   test "add and fetch account" do
-    {:ok, cache} = Cache.start()
+    Bank.System.start_link()
     customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
-    server = Cache.server_process(cache, customer_id)
+    server = Cache.server_process(customer_id)
     # {:ok, server} = Server.start(customer_id)
 
     account_9001 = %Bank.Account{number: 9001, type: "CHK", balance: 100_00}
@@ -19,9 +19,9 @@ defmodule BankCustomerServerTest do
   end
 
   test "account by account id" do
-    {:ok, cache} = Cache.start()
+    Bank.System.start_link()
     customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
-    server = Cache.server_process(cache, customer_id)
+    server = Cache.server_process(customer_id)
 
     account_1001 = %Bank.Account{number: 1001, type: "CHK", balance: 100_00}
     Server.add_account(server, account_1001)
@@ -32,9 +32,9 @@ defmodule BankCustomerServerTest do
   end
 
   test "account by number" do
-    {:ok, cache} = Cache.start()
+    Bank.System.start_link()
     customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
-    server = Cache.server_process(cache, customer_id)
+    server = Cache.server_process(customer_id)
 
     account_1001 = %Bank.Account{number: 2001, type: "CHK", balance: 100_00}
     Server.add_account(server, account_1001)

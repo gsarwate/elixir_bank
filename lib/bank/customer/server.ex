@@ -6,8 +6,8 @@ defmodule Bank.Customer.Server do
   @doc """
   Defines a function to start a server(GenServer). For every customer new server is created
   """
-  def start(customer_id) do
-    GenServer.start(Bank.Customer.Server, customer_id)
+  def start_link(customer_id) do
+    GenServer.start_link(Bank.Customer.Server, customer_id)
   end
 
   @doc """
