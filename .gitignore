@@ -24,3 +24,6 @@ elixir_otp_bank-*.tar
 
 # VS Code
 .elixir_ls/
+
+# application
+data/

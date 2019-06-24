@@ -18,6 +18,7 @@ defmodule Bank.Customer.Cache do
 
   @impl true
   def init(_) do
+    Bank.Customer.Database.start()
     {:ok, %{}}
   end
 

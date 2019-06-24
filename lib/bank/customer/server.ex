@@ -6,8 +6,8 @@ defmodule Bank.Customer.Server do
   @doc """
   Defines a function to start a server(GenServer). For every customer new server is created
   """
-  def start(id) do
-    GenServer.start(Bank.Customer.Server, id)
+  def start(customer_id) do
+    GenServer.start(Bank.Customer.Server, customer_id)
   end
 
   @doc """
@@ -27,8 +27,8 @@ defmodule Bank.Customer.Server do
   @doc """
   Defines a function to get customer account by account id
   """
-  def account_by_id(bank_server, id) do
-    GenServer.call(bank_server, {:account_by_id, id})
+  def account_by_id(bank_server, account_id) do
+    GenServer.call(bank_server, {:account_by_id, account_id})
   end
 
   @doc """
@@ -41,28 +41,31 @@ defmodule Bank.Customer.Server do
   # Server (callbacks)
 
   @impl true
-  def init(id) do
-    {:ok, Bank.Customer.new(id)}
+  def init(customer_id) do
+    {:ok,
+     {customer_id, Bank.Customer.Database.get(customer_id) || Bank.Customer.new(customer_id)}}
   end
 
   @impl true
-  def handle_cast({:add_account, new_account}, customer) do
-    new_state = Bank.Customer.add_account(customer, new_account)
-    {:noreply, new_state}
+  def handle_cast({:add_account, new_account}, {customer_id, customer}) do
+    updated_customer = Bank.Customer.add_account(customer, new_account)
+    Bank.Customer.Database.store(customer_id, updated_customer)
+    {:noreply, {customer_id, updated_customer}}
   end
 
   @impl true
-  def handle_call({:accounts}, _from, customer) do
-    {:reply, Bank.Customer.get_accounts(customer), customer}
+  def handle_call({:accounts}, _from, {customer_id, customer}) do
+    {:reply, Bank.Customer.get_accounts(customer), {customer_id, customer}}
   end
 
   @impl true
-  def handle_call({:account_by_id, id}, _from, customer) do
-    {:reply, Bank.Customer.get_account_by_id(customer, id), customer}
+  def handle_call({:account_by_id, account_id}, _from, {customer_id, customer}) do
+    {:reply, Bank.Customer.get_account_by_id(customer, account_id), {customer_id, customer}}
   end
 
   @impl true
-  def handle_call({:account_by_number, account_number}, _from, customer) do
-    {:reply, Bank.Customer.get_account_by_number(customer, account_number), customer}
+  def handle_call({:account_by_number, account_number}, _from, {customer_id, customer}) do
+    {:reply, Bank.Customer.get_account_by_number(customer, account_number),
+     {customer_id, customer}}
   end
 end

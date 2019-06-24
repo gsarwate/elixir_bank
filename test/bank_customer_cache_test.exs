@@ -6,19 +6,22 @@ defmodule BankCustomerCacheTest do
 
   test "customer server process" do
     {:ok, cache} = Cache.start()
-    server_pid_customer_123 = Cache.server_process(cache, 123)
+    customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
+    customer_server_pid = Cache.server_process(cache, customer_id)
 
-    assert server_pid_customer_123 == Cache.server_process(cache, 123)
-    refute server_pid_customer_123 == Cache.server_process(cache, 321)
+    assert customer_server_pid == Cache.server_process(cache, customer_id)
+    customer_id = customer_id + 10
+    refute customer_server_pid == Cache.server_process(cache, customer_id)
   end
 
   test "customer operations" do
     {:ok, cache} = Cache.start()
-    server_pid_customer_123 = Cache.server_process(cache, 123)
+    customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
+    customer_server_pid = Cache.server_process(cache, customer_id)
 
     account_987 = %Bank.Account{number: 987, type: "CHK", balance: 100_00}
-    Server.add_account(server_pid_customer_123, account_987)
-    accounts = Server.accounts(server_pid_customer_123)
+    Server.add_account(customer_server_pid, account_987)
+    accounts = Server.accounts(customer_server_pid)
 
     assert [%{number: 987, type: "CHK", balance: 100_00}] = accounts
   end
