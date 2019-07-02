@@ -5,7 +5,7 @@ defmodule Bank.Customer.Database do
 
   # Client
 
-  def start_link() do
+  def start_link(_) do
     IO.puts("--> Start : Bank Customer Database.")
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
