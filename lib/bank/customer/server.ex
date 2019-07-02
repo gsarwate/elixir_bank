@@ -1,5 +1,5 @@
 defmodule Bank.Customer.Server do
-  use GenServer
+  use GenServer, restart: :temporary
 
   # Client
 
@@ -7,7 +7,12 @@ defmodule Bank.Customer.Server do
   Defines a function to start a server(GenServer). For every customer new server is created
   """
   def start_link(customer_id) do
-    GenServer.start_link(Bank.Customer.Server, customer_id)
+    IO.puts("Start -> Bank Customer Server for #{customer_id}")
+    GenServer.start_link(Bank.Customer.Server, customer_id, name: via_tuple(customer_id))
+  end
+
+  defp via_tuple(customer_id) do
+    Bank.Customer.ProcessRegistry.via_tuple(customer_id)
   end
 
   @doc """

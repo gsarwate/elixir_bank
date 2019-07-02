@@ -2,8 +2,6 @@ defmodule Bank.Customer.Database do
   @pool_size 3
   @db_folder "./data/customer"
 
-  # Client
-
   def start_link() do
     IO.puts("--> Start : Bank Customer Database.")
     File.mkdir_p!(@db_folder)
