@@ -1,6 +1,8 @@
 defmodule Bank.Customer.Server do
   use GenServer, restart: :temporary
 
+  @server_idle_timeout :timer.seconds(10)
+
   # Client
 
   @doc """
@@ -47,30 +49,53 @@ defmodule Bank.Customer.Server do
 
   @impl true
   def init(customer_id) do
-    {:ok,
-     {customer_id, Bank.Customer.Database.get(customer_id) || Bank.Customer.new(customer_id)}}
+    {
+      :ok,
+      {customer_id, Bank.Customer.Database.get(customer_id) || Bank.Customer.new(customer_id)},
+      @server_idle_timeout
+    }
   end
 
   @impl true
   def handle_cast({:add_account, new_account}, {customer_id, customer}) do
     updated_customer = Bank.Customer.add_account(customer, new_account)
     Bank.Customer.Database.store(customer_id, updated_customer)
-    {:noreply, {customer_id, updated_customer}}
+    {:noreply, {customer_id, updated_customer}, @server_idle_timeout}
   end
 
   @impl true
   def handle_call({:accounts}, _from, {customer_id, customer}) do
-    {:reply, Bank.Customer.get_accounts(customer), {customer_id, customer}}
+    {
+      :reply,
+      Bank.Customer.get_accounts(customer),
+      {customer_id, customer},
+      @server_idle_timeout
+    }
   end
 
   @impl true
   def handle_call({:account_by_id, account_id}, _from, {customer_id, customer}) do
-    {:reply, Bank.Customer.get_account_by_id(customer, account_id), {customer_id, customer}}
+    {
+      :reply,
+      Bank.Customer.get_account_by_id(customer, account_id),
+      {customer_id, customer},
+      @server_idle_timeout
+    }
   end
 
   @impl true
   def handle_call({:account_by_number, account_number}, _from, {customer_id, customer}) do
-    {:reply, Bank.Customer.get_account_by_number(customer, account_number),
-     {customer_id, customer}}
+    {
+      :reply,
+      Bank.Customer.get_account_by_number(customer, account_number),
+      {customer_id, customer},
+      @server_idle_timeout
+    }
+  end
+
+  @impl true
+  def handle_info(:timeout, {customer_id, customer}) do
+    IO.puts(" Stop -> Bank Customer Server for #{customer_id}")
+    {:stop, :normal, {customer_id, customer}}
   end
 end
