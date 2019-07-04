@@ -5,7 +5,6 @@ defmodule BankCustomerCacheTest do
   alias Bank.Customer.Server
 
   test "customer server process" do
-    Bank.System.start_link()
     customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
     customer_server_pid = Cache.server_process(customer_id)
 
@@ -15,7 +14,6 @@ defmodule BankCustomerCacheTest do
   end
 
   test "customer operations" do
-    Bank.System.start_link()
     customer_id = DateTime.utc_now() |> DateTime.to_unix(:nanosecond)
     customer_server_pid = Cache.server_process(customer_id)
 
