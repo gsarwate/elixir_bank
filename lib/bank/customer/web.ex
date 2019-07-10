@@ -46,7 +46,7 @@ defmodule Bank.Customer.Web do
   def child_spec(_arg) do
     Plug.Adapters.Cowboy.child_spec(
       scheme: :http,
-      options: [port: 5454],
+      options: [port: Application.fetch_env!(:elixir_otp_bank, :http_port)],
       plug: __MODULE__
     )
   end
