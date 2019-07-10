@@ -22,7 +22,10 @@ defmodule ElixirOTPBank.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poolboy, "~> 1.5"}
+      {:poolboy, "~> 1.5"},
+      {:cowboy, "~> 2.6.3"},
+      {:plug, "~> 1.8.2"},
+      {:plug_cowboy, "~> 2.1.0"},
     ]
   end
 end

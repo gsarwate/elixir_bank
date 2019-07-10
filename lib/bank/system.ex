@@ -4,7 +4,8 @@ defmodule Bank.System do
       [
         Bank.Customer.ProcessRegistry,
         Bank.Customer.Database,
-        Bank.Customer.Cache
+        Bank.Customer.Cache,
+        Bank.Customer.Web
       ],
       strategy: :one_for_one
     )
