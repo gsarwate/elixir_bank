@@ -7,7 +7,8 @@ defmodule ElixirOTPBank.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: [release: :prod]
     ]
   end
 
@@ -26,6 +27,7 @@ defmodule ElixirOTPBank.MixProject do
       {:cowboy, "~> 2.6.3"},
       {:plug, "~> 1.8.2"},
       {:plug_cowboy, "~> 2.1.0"},
+      {:distillery, "~> 2.0"},
     ]
   end
 end
