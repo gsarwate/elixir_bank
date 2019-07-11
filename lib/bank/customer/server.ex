@@ -10,11 +10,21 @@ defmodule Bank.Customer.Server do
   """
   def start_link(customer_id) do
     IO.puts("Start -> Bank Customer Server for #{customer_id}")
-    GenServer.start_link(Bank.Customer.Server, customer_id, name: via_tuple(customer_id))
+    GenServer.start_link(Bank.Customer.Server, customer_id, name: global_name(customer_id))
   end
 
-  defp via_tuple(customer_id) do
-    Bank.Customer.ProcessRegistry.via_tuple(customer_id)
+  defp global_name(customer_id) do
+    {:global, {__MODULE__, customer_id}}
+  end
+
+  def whereis(customer_id) do
+    case :global.whereis_name({__MODULE__, customer_id}) do
+      :undefined ->
+        nil
+
+      pid ->
+        pid
+    end
   end
 
   @doc """

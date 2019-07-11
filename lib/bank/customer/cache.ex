@@ -21,19 +21,23 @@ defmodule Bank.Customer.Cache do
   end
 
   def server_process(customer_id) do
-    case start_child(customer_id) do
+    existing_process(customer_id) || new_process(customer_id)
+  end
+
+  defp existing_process(customer_id) do
+    Bank.Customer.Server.whereis(customer_id)
+  end
+
+  defp new_process(customer_id) do
+    case DynamicSupervisor.start_child(
+           __MODULE__,
+           {Bank.Customer.Server, customer_id}
+         ) do
       {:ok, pid} ->
         pid
 
       {:error, {:already_started, pid}} ->
         pid
     end
-  end
-
-  defp start_child(customer_id) do
-    DynamicSupervisor.start_child(
-      __MODULE__,
-      {Bank.Customer.Server, customer_id}
-    )
   end
 end
