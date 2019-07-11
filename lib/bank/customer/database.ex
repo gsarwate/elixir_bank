@@ -1,21 +1,36 @@
 defmodule Bank.Customer.Database do
-  @db_folder "./data/customer"
-
   def child_spec(_) do
-    File.mkdir_p!(@db_folder)
+    db_settings = Application.fetch_env!(:elixir_otp_bank, :database)
+    [name_prefix, _] = "#{node()}" |> String.split("@")
+    db_folder = "#{Keyword.fetch!(db_settings, :folder)}/#{name_prefix}/"
+
+    File.mkdir_p!(db_folder)
 
     :poolboy.child_spec(
       __MODULE__,
       [
         name: {:local, __MODULE__},
         worker_module: Bank.Customer.DatabaseWorker,
-        size: 3
+        size: Keyword.fetch!(db_settings, :pool_size)
       ],
-      [@db_folder]
+      [db_folder]
     )
   end
 
   def store(key, data) do
+    {_results, bad_nodes} =
+      :rpc.multicall(
+        __MODULE__,
+        :store_local,
+        [key, data],
+        :timer.seconds(5)
+      )
+
+    Enum.each(bad_nodes, &IO.puts("Store failed on node #{&1}"))
+    :ok
+  end
+
+  def store_local(key, data) do
     :poolboy.transaction(
       __MODULE__,
       fn worker_pid ->

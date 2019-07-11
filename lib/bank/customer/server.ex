@@ -1,8 +1,6 @@
 defmodule Bank.Customer.Server do
   use GenServer, restart: :temporary
 
-  @server_idle_timeout :timer.seconds(10)
-
   # Client
 
   @doc """
@@ -62,7 +60,7 @@ defmodule Bank.Customer.Server do
     {
       :ok,
       {customer_id, Bank.Customer.Database.get(customer_id) || Bank.Customer.new(customer_id)},
-      @server_idle_timeout
+      expiry_idle_timeout()
     }
   end
 
@@ -70,7 +68,7 @@ defmodule Bank.Customer.Server do
   def handle_cast({:add_account, new_account}, {customer_id, customer}) do
     updated_customer = Bank.Customer.add_account(customer, new_account)
     Bank.Customer.Database.store(customer_id, updated_customer)
-    {:noreply, {customer_id, updated_customer}, @server_idle_timeout}
+    {:noreply, {customer_id, updated_customer}, expiry_idle_timeout()}
   end
 
   @impl true
@@ -79,7 +77,7 @@ defmodule Bank.Customer.Server do
       :reply,
       Bank.Customer.get_accounts(customer),
       {customer_id, customer},
-      @server_idle_timeout
+      expiry_idle_timeout()
     }
   end
 
@@ -89,7 +87,7 @@ defmodule Bank.Customer.Server do
       :reply,
       Bank.Customer.get_account_by_id(customer, account_id),
       {customer_id, customer},
-      @server_idle_timeout
+      expiry_idle_timeout()
     }
   end
 
@@ -99,7 +97,7 @@ defmodule Bank.Customer.Server do
       :reply,
       Bank.Customer.get_account_by_number(customer, account_number),
       {customer_id, customer},
-      @server_idle_timeout
+      expiry_idle_timeout()
     }
   end
 
@@ -108,4 +106,6 @@ defmodule Bank.Customer.Server do
     IO.puts(" Stop -> Bank Customer Server for #{customer_id}")
     {:stop, :normal, {customer_id, customer}}
   end
+
+  defp expiry_idle_timeout(), do: Application.fetch_env!(:elixir_otp_bank, :todo_item_expiry)
 end
