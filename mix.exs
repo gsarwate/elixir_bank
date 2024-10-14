@@ -24,10 +24,10 @@ defmodule ElixirOTPBank.MixProject do
   defp deps do
     [
       {:poolboy, "~> 1.5"},
-      {:cowboy, "~> 2.6.3"},
-      {:plug, "~> 1.8.2"},
-      {:plug_cowboy, "~> 2.1.0"},
-      {:distillery, "~> 2.0"},
+      {:cowboy, "~> 2.7"},
+      {:plug, "~> 1.14"},
+      {:plug_cowboy, "~> 2.7.2"},
+      {:distillery, "~> 2.0"}
     ]
   end
 end
